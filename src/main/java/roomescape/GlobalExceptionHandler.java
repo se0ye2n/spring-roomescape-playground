@@ -27,4 +27,13 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(new ErrorResponse("예약 정보가 올바르지 않습니다."));
     }
+
+    @ExceptionHandler(NotFoundTimeException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundTime(
+            NotFoundTimeException exception
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(exception.getMessage()));
+    }
 }
