@@ -117,4 +117,36 @@ public class MissionStepTest {
 
         assertThat(countAfterDelete).isEqualTo(0);
     }
+
+    @Test
+    void 팔단계() {
+        Map<String, String> params = new HashMap<>();
+        params.put("time", "10:00");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/times")
+                .then()
+                .statusCode(201)
+                .header("Location", "/times/1")
+                .body("time", equalTo("10:00"));
+
+        RestAssured.given()
+                .when().get("/times")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(1));
+
+        RestAssured.given()
+                .when().delete("/times/1")
+                .then()
+                .statusCode(204);
+
+        RestAssured.given()
+                .when().get("/times")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(0));
+    }
 }
