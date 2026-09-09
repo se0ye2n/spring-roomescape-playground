@@ -81,7 +81,14 @@ public class MissionStepTest {
 
     @Test
     void sevenStep() {
-        Map<String, String> params = new HashMap<>();
+        int timeId = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(Map.of("time", "10:00"))
+                .when().post("/times")
+                .then().statusCode(201)
+                .extract().path("id");
+
+        Map<String, Object> params = new HashMap<>();
 
         params.put("name", "브라운");
         params.put(
@@ -90,7 +97,7 @@ public class MissionStepTest {
                         .plusDays(1)
                         .toString()
         );
-        params.put("time", "10:00");
+        params.put("time", timeId);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -98,7 +105,9 @@ public class MissionStepTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201)
-                .header("Location", "/reservations/1");
+                .header("Location", "/reservations/1")
+                .body("time.id", equalTo(timeId))
+                .body("time.time", equalTo("10:00"));
 
         Integer count = jdbcTemplate.queryForObject(
                 "SELECT count(1) FROM reservation",
