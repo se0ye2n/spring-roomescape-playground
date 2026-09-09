@@ -18,13 +18,13 @@ public class ReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<ReservationsResponse> reservations() {
+    public ResponseEntity<List<ReservationResponse>> reservations() {
         List<ReservationResponse> responses = reservationService.findAll()
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
 
-        return ResponseEntity.ok(new ReservationsResponse(responses));
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
