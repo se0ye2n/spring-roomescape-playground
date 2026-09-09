@@ -149,4 +149,34 @@ public class MissionStepTest {
                 .statusCode(200)
                 .body("size()", equalTo(0));
     }
+
+    @Test
+    void 구단계() {
+        Map<String, String> reservation = new HashMap<>();
+        reservation.put("name", "브라운");
+        reservation.put("date", "2099-08-05");
+        reservation.put("time", "10:00");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(reservation)
+                .when().post("/reservations")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void 존재하지_않는_시간으로_예약할_수_없다() {
+        Map<String, Object> reservation = new HashMap<>();
+        reservation.put("name", "브라운");
+        reservation.put("date", "2099-08-05");
+        reservation.put("time", 999);
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(reservation)
+                .when().post("/reservations")
+                .then()
+                .statusCode(400);
+    }
 }
