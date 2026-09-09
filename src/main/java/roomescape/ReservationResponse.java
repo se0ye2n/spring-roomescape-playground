@@ -5,9 +5,14 @@ public class ReservationResponse {
     private final Long id;
     private final String name;
     private final String date;
-    private final String time;
+    private final ReservationTime time;
 
-    public ReservationResponse(Long id, String name, String date, String time) {
+    public ReservationResponse(
+            Long id,
+            String name,
+            String date,
+            ReservationTime time
+    ) {
         this.id = id;
         this.name = name;
         this.date = date;
@@ -35,7 +40,7 @@ public class ReservationResponse {
         return date;
     }
 
-    public String getTime() {
+    public ReservationTime getTime() {
         return time;
     }
 }

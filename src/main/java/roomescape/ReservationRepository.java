@@ -14,12 +14,21 @@ import java.util.Optional;
 @Repository
 public class ReservationRepository {
 
+    private static final String SELECT_SQL = """
+            SELECT r.id, r.name, r.date, t.id AS time_id, t.time
+            FROM reservation r
+            JOIN reservation_time t ON r.time_id = t.id
+            """;
+
     private static final RowMapper<Reservation> ROW_MAPPER =
             (rs, rowNum) -> new Reservation(
                     rs.getLong("id"),
                     rs.getString("name"),
                     rs.getString("date"),
-                    rs.getString("time")
+                    new ReservationTime(
+                            rs.getLong("time_id"),
+                            rs.getString("time")
+                    )
             );
 
     private final JdbcTemplate jdbcTemplate;
@@ -29,66 +38,73 @@ public class ReservationRepository {
     }
 
     public List<Reservation> findAll() {
-        String sql = "SELECT id, name, date, time FROM reservation";
-
-        return jdbcTemplate.query(sql, ROW_MAPPER);
+        return jdbcTemplate.query(
+                SELECT_SQL + " ORDER BY r.id",
+                ROW_MAPPER
+        );
     }
 
     public Optional<Reservation> findById(Long id) {
-        String sql =
-                "SELECT id, name, date, time FROM reservation WHERE id = ?";
-
-        return jdbcTemplate.query(sql, ROW_MAPPER, id)
+        return jdbcTemplate.query(
+                        SELECT_SQL + " WHERE r.id = ?",
+                        ROW_MAPPER,
+                        id
+                )
                 .stream()
                 .findFirst();
     }
 
-    public Reservation save(ReservationRequest request) {
-        String sql =
-                "INSERT INTO reservation (name, date, time) VALUES (?, ?, ?)";
+    public Reservation save(Reservation reservation) {
+        String sql = """
+                INSERT INTO reservation (name, date, time_id)
+                VALUES (?, ?, ?)
+                """;
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps =
-                    connection.prepareStatement(
-                            sql,
-                            Statement.RETURN_GENERATED_KEYS
-                    );
+            PreparedStatement statement = connection.prepareStatement(
+                    sql,
+                    Statement.RETURN_GENERATED_KEYS
+            );
 
-            ps.setString(1, request.getName());
-            ps.setString(2, request.getDate());
-            ps.setString(3, request.getTime());
+            statement.setString(1, reservation.getName());
+            statement.setString(2, reservation.getDate());
+            statement.setLong(3, reservation.getTime().getId());
 
-            return ps;
+            return statement;
         }, keyHolder);
 
         Long id = keyHolder.getKey().longValue();
 
         return new Reservation(
                 id,
-                request.getName(),
-                request.getDate(),
-                request.getTime()
+                reservation.getName(),
+                reservation.getDate(),
+                reservation.getTime()
         );
     }
 
-    public int update(Long id, ReservationRequest request) {
-        String sql =
-                "UPDATE reservation SET name = ?, date = ?, time = ? WHERE id = ?";
+    public int update(Reservation reservation) {
+        String sql = """
+                UPDATE reservation
+                SET name = ?, date = ?, time_id = ?
+                WHERE id = ?
+                """;
 
         return jdbcTemplate.update(
                 sql,
-                request.getName(),
-                request.getDate(),
-                request.getTime(),
-                id
+                reservation.getName(),
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getId()
         );
     }
 
     public int delete(Long id) {
-        String sql = "DELETE FROM reservation WHERE id = ?";
-
-        return jdbcTemplate.update(sql, id);
+        return jdbcTemplate.update(
+                "DELETE FROM reservation WHERE id = ?",
+                id
+        );
     }
 }
