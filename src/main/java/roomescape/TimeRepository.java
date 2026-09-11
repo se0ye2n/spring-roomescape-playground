@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Repository
 public class TimeRepository {
@@ -60,9 +61,13 @@ public class TimeRepository {
     }
 
     public int delete(Long id) {
-        return jdbcTemplate.update(
-                "DELETE FROM reservation_time WHERE id = ?",
-                id
-        );
+        try {
+            return jdbcTemplate.update(
+                    "DELETE FROM reservation_time WHERE id = ?",
+                    id
+            );
+        } catch (DataIntegrityViolationException exception) {
+            throw new ReservationTimeInUseException(exception);
+        }
     }
 }
