@@ -88,16 +88,15 @@ public class ReservationService {
                 .orElseThrow(InvalidReservationException::new);
     }
 
-    private void validateReservationDateTime(String date, String time) {
+    private void validateReservationDateTime(String date, LocalTime time) {
         if (date == null || !date.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
             throw new InvalidReservationException();
         }
 
         try {
             LocalDate parsedDate = LocalDate.parse(date, DATE_FORMATTER);
-            LocalTime parsedTime = LocalTime.parse(time);
             LocalDateTime reservationDateTime =
-                    LocalDateTime.of(parsedDate, parsedTime);
+                    LocalDateTime.of(parsedDate, time);
 
             if (!reservationDateTime.isAfter(LocalDateTime.now(clock))) {
                 throw new InvalidReservationException();

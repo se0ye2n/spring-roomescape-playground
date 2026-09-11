@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
+import java.time.LocalTime;
 
 @Repository
 public class TimeRepository {
@@ -18,7 +19,7 @@ public class TimeRepository {
     private static final RowMapper<ReservationTime> ROW_MAPPER =
             (rs, rowNum) -> new ReservationTime(
                     rs.getLong("id"),
-                    rs.getString("time")
+                    LocalTime.parse(rs.getString("time"))
             );
 
     private final JdbcTemplate jdbcTemplate;
@@ -41,7 +42,7 @@ public class TimeRepository {
                 .findFirst();
     }
 
-    public ReservationTime save(String time) {
+    public ReservationTime save(LocalTime time) {
         String sql = "INSERT INTO reservation_time (time) VALUES (?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -51,7 +52,7 @@ public class TimeRepository {
                     Statement.RETURN_GENERATED_KEYS
             );
 
-            statement.setString(1, time);
+            statement.setString(1, time.toString());
             return statement;
         }, keyHolder);
 

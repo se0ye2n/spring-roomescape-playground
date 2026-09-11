@@ -1,8 +1,8 @@
 package roomescape;
 
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.time.LocalTime;
 
 @Service
 public class TimeService {
@@ -18,7 +18,9 @@ public class TimeService {
     }
 
     public ReservationTime create(TimeRequest request) {
-        return timeRepository.save(request.getTime());
+        LocalTime time = LocalTime.parse(request.getTime());
+
+        return timeRepository.save(time);
     }
 
     public void delete(Long id) {

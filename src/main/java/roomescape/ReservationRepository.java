@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalTime;
 
 @Repository
 public class ReservationRepository {
@@ -27,7 +28,7 @@ public class ReservationRepository {
                     rs.getString("date"),
                     new ReservationTime(
                             rs.getLong("time_id"),
-                            rs.getString("time")
+                            LocalTime.parse(rs.getString("time"))
                     )
             );
 

@@ -12,6 +12,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.time.LocalTime;
 
 class ReservationServiceTest {
 
@@ -41,7 +42,9 @@ class ReservationServiceTest {
 
     private void 시간등록(String time) {
         when(timeRepository.findById(1L))
-                .thenReturn(Optional.of(new ReservationTime(1L, time)));
+                .thenReturn(Optional.of(
+                        new ReservationTime(1L, LocalTime.parse(time))
+                ));
     }
 
     @Test
@@ -85,7 +88,8 @@ class ReservationServiceTest {
         assertThat(saved.getName()).isEqualTo("브라운");
         assertThat(saved.getDate()).isEqualTo("2026-09-06");
         assertThat(saved.getTime().getId()).isEqualTo(1L);
-        assertThat(saved.getTime().getTime()).isEqualTo("10:01");
+        assertThat(saved.getTime().getTime())
+                .isEqualTo(LocalTime.of(10, 1));
     }
 
     @Test
