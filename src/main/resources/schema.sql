@@ -1,7 +1,7 @@
 CREATE TABLE reservation_time
 (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    time VARCHAR(5) NOT NULL,
+    time TIME NOT NULL,
     PRIMARY KEY (id)
 );
 

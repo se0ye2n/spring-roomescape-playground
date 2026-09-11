@@ -19,7 +19,7 @@ public class TimeRepository {
     private static final RowMapper<ReservationTime> ROW_MAPPER =
             (rs, rowNum) -> new ReservationTime(
                     rs.getLong("id"),
-                    LocalTime.parse(rs.getString("time"))
+                    rs.getObject("time", LocalTime.class)
             );
 
     private final JdbcTemplate jdbcTemplate;
@@ -52,7 +52,7 @@ public class TimeRepository {
                     Statement.RETURN_GENERATED_KEYS
             );
 
-            statement.setString(1, time.toString());
+            statement.setString(1, time);
             return statement;
         }, keyHolder);
 
