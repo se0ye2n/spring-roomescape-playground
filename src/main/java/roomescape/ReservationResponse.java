@@ -5,13 +5,13 @@ public class ReservationResponse {
     private final Long id;
     private final String name;
     private final String date;
-    private final ReservationTime time;
+    private final ReservationTimeResponse time;
 
     public ReservationResponse(
             Long id,
             String name,
             String date,
-            ReservationTime time
+            ReservationTimeResponse time
     ) {
         this.id = id;
         this.name = name;
@@ -24,7 +24,7 @@ public class ReservationResponse {
                 reservation.getId(),
                 reservation.getName(),
                 reservation.getDate(),
-                reservation.getTime()
+                ReservationTimeResponse.from(reservation.getTime())
         );
     }
 
@@ -40,7 +40,7 @@ public class ReservationResponse {
         return date;
     }
 
-    public ReservationTime getTime() {
+    public ReservationTimeResponse getTime() {
         return time;
     }
 }

@@ -18,19 +18,24 @@ public class TimeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationTime>> findAll() {
-        return ResponseEntity.ok(timeService.findAll());
+    public ResponseEntity<List<ReservationTimeResponse>> findAll() {
+        List<ReservationTimeResponse> responses = timeService.findAll()
+                .stream()
+                .map(ReservationTimeResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping
-    public ResponseEntity<ReservationTime> create(
+    public ResponseEntity<ReservationTimeResponse> create(
             @Valid @RequestBody TimeRequest request
     ) {
         ReservationTime time = timeService.create(request);
 
         return ResponseEntity
                 .created(URI.create("/times/" + time.getId()))
-                .body(time);
+                .body(ReservationTimeResponse.from(time));
     }
 
     @DeleteMapping("/{id}")
