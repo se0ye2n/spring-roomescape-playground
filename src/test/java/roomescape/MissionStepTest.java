@@ -208,4 +208,76 @@ public class MissionStepTest {
 
         assertThat(isJdbcTemplateInjected).isFalse();
     }
+
+    @Test
+    void 예약에서_사용_중인_시간은_삭제할_수_없다() {
+        // 1. 예약 시간을 등록한다.
+        int timeId = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(Map.of("time", "10:00"))
+                .when().post("/times")
+                .then()
+                .statusCode(201)
+                .extract().path("id");
+
+        // 2. 등록된 시간으로 예약한다.
+        Map<String, Object> reservation = new HashMap<>();
+        reservation.put("name", "브라운");
+        reservation.put(
+                "date",
+                java.time.LocalDate.now(java.time.ZoneId.of("Asia/Seoul"))
+                        .plusDays(1)
+                        .toString()
+        );
+        reservation.put("time", timeId);
+
+        int reservationId = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(reservation)
+                .when().post("/reservations")
+                .then()
+                .statusCode(201)
+                .extract().path("id");
+
+        // 3. 사용 중인 시간을 삭제하면 409와 오류 메시지를 반환한다.
+        RestAssured.given()
+                .when().delete("/times/" + timeId)
+                .then()
+                .statusCode(409)
+                .body(
+                        "message",
+                        equalTo("예약에서 사용 중인 시간은 삭제할 수 없습니다.")
+                );
+
+        // 4. 삭제 실패 후에도 시간과 예약 정보가 유지된다.
+        RestAssured.given()
+                .when().get("/times")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(1))
+                .body("[0].id", equalTo(timeId));
+
+        RestAssured.given()
+                .when().get("/reservations/" + reservationId)
+                .then()
+                .statusCode(200)
+                .body("time.id", equalTo(timeId));
+
+        // 5. 예약을 삭제하면 해당 시간도 삭제할 수 있다.
+        RestAssured.given()
+                .when().delete("/reservations/" + reservationId)
+                .then()
+                .statusCode(204);
+
+        RestAssured.given()
+                .when().delete("/times/" + timeId)
+                .then()
+                .statusCode(204);
+
+        RestAssured.given()
+                .when().get("/times")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(0));
+    }
 }
