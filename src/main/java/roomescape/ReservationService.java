@@ -41,28 +41,37 @@ public class ReservationService {
                 .orElseThrow(NotFoundReservationException::new);
     }
 
-    public Reservation create(ReservationRequest request) {
-        ReservationTime time = findTime(request.getTime());
-        validateReservationDateTime(request.getDate(), time.getTime());
+    public Reservation create(String name, String date, Long timeId) {
+        validateName(name);
+
+        ReservationTime time = findTime(timeId);
+        validateReservationDateTime(date, time.getTime());
 
         Reservation reservation = new Reservation(
                 null,
-                request.getName(),
-                request.getDate(),
+                name,
+                date,
                 time
         );
 
         return reservationRepository.save(reservation);
     }
 
-    public Reservation update(Long id, ReservationRequest request) {
-        ReservationTime time = findTime(request.getTime());
-        validateReservationDateTime(request.getDate(), time.getTime());
+    public Reservation update(
+            Long id,
+            String name,
+            String date,
+            Long timeId
+    ) {
+        validateName(name);
+
+        ReservationTime time = findTime(timeId);
+        validateReservationDateTime(date, time.getTime());
 
         Reservation reservation = new Reservation(
                 id,
-                request.getName(),
-                request.getDate(),
+                name,
+                date,
                 time
         );
 
@@ -79,6 +88,12 @@ public class ReservationService {
         }
     }
 
+    private void validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new InvalidReservationException();
+        }
+    }
+
     private ReservationTime findTime(Long timeId) {
         if (timeId == null || timeId <= 0) {
             throw new InvalidReservationException();
@@ -88,8 +103,12 @@ public class ReservationService {
                 .orElseThrow(InvalidReservationException::new);
     }
 
-    private void validateReservationDateTime(String date, LocalTime time) {
-        if (date == null || !date.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
+    private void validateReservationDateTime(
+            String date,
+            LocalTime time
+    ) {
+        if (date == null
+                || !date.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
             throw new InvalidReservationException();
         }
 

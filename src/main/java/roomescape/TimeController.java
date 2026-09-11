@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/times")
@@ -31,8 +32,9 @@ public class TimeController {
     public ResponseEntity<ReservationTimeResponse> create(
             @Valid @RequestBody TimeRequest request
     ) {
-        ReservationTime time = timeService.create(request);
-
+        ReservationTime time = timeService.create(
+                LocalTime.parse(request.getTime())
+        );
         return ResponseEntity
                 .created(URI.create("/times/" + time.getId()))
                 .body(ReservationTimeResponse.from(time));

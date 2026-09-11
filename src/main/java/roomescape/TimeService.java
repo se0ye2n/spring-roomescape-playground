@@ -17,10 +17,11 @@ public class TimeService {
         return timeRepository.findAll();
     }
 
-    public ReservationTime create(TimeRequest request) {
-        LocalTime time = LocalTime.parse(request.getTime());
+    public ReservationTime create(LocalTime time) {
+        ReservationTime reservationTime =
+                new ReservationTime(null, time);
 
-        return timeRepository.save(time);
+        return timeRepository.save(reservationTime.getTime());
     }
 
     public void delete(Long id) {
