@@ -2,7 +2,6 @@ package roomescape;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.DateTimeException;
 import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,12 +22,6 @@ class ReservationTimeTest {
         assertThatThrownBy(() -> new ReservationTime(1L, null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("예약 시간은 필수입니다.");
-    }
-
-    @Test
-    void 잘못된_시각은_LocalTime으로_표현할_수_없다() {
-        assertThatThrownBy(() -> LocalTime.of(99, 99))
-                .isInstanceOf(DateTimeException.class);
     }
 
     @Test

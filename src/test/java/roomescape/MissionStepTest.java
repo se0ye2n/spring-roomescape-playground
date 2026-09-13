@@ -280,4 +280,32 @@ public class MissionStepTest {
                 .statusCode(200)
                 .body("size()", equalTo(0));
     }
+
+    @Test
+    void 잘못된_시간_형식으로_예약_시간을_등록할_수_없다() {
+        String[] invalidTimes = {
+                "",
+                "ab:cd",
+                "99:99",
+                "24:00",
+                "10:60",
+                "9:00",
+                "10:00:30"
+        };
+
+        for (String invalidTime : invalidTimes) {
+            RestAssured.given()
+                    .contentType(ContentType.JSON)
+                    .body(Map.of("time", invalidTime))
+                    .when().post("/times")
+                    .then()
+                    .statusCode(400);
+        }
+
+        RestAssured.given()
+                .when().get("/times")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(0));
+    }
 }
