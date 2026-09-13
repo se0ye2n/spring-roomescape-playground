@@ -34,7 +34,7 @@ class TimeRepositoryTest {
     }
 
     @Test
-    void DB는_잘못된_시간_문자열을_거부한다() {
+    void H2는_잘못된_시간_문자열을_거부한다() {
         for (String invalidTime : new String[]{"ab:cd", "99:99"}) {
             assertThatThrownBy(() -> jdbcTemplate.update(
                     "INSERT INTO reservation_time (time) VALUES (?)",
