@@ -52,7 +52,7 @@ public class TimeRepository {
                     Statement.RETURN_GENERATED_KEYS
             );
 
-            statement.setString(1, time);
+            statement.setObject(1, time);
             return statement;
         }, keyHolder);
 
