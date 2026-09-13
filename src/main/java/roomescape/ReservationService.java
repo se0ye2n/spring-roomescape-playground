@@ -45,12 +45,13 @@ public class ReservationService {
         validateName(name);
 
         ReservationTime time = findTime(timeId);
-        validateReservationDateTime(date, time.getTime());
+        LocalDate reservationDate =
+                validateReservationDateTime(date, time.getTime());
 
         Reservation reservation = new Reservation(
                 null,
                 name,
-                date,
+                reservationDate,
                 time
         );
 
@@ -66,12 +67,13 @@ public class ReservationService {
         validateName(name);
 
         ReservationTime time = findTime(timeId);
-        validateReservationDateTime(date, time.getTime());
+        LocalDate reservationDate =
+                validateReservationDateTime(date, time.getTime());
 
         Reservation reservation = new Reservation(
                 id,
                 name,
-                date,
+                reservationDate,
                 time
         );
 
@@ -103,7 +105,7 @@ public class ReservationService {
                 .orElseThrow(InvalidReservationException::new);
     }
 
-    private void validateReservationDateTime(
+    private LocalDate validateReservationDateTime(
             String date,
             LocalTime time
     ) {
@@ -120,6 +122,8 @@ public class ReservationService {
             if (!reservationDateTime.isAfter(LocalDateTime.now(clock))) {
                 throw new InvalidReservationException();
             }
+
+            return parsedDate;
         } catch (DateTimeParseException exception) {
             throw new InvalidReservationException();
         }

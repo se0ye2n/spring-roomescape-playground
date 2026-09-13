@@ -13,6 +13,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import java.time.LocalDate;
 
 class ReservationServiceTest {
 
@@ -84,7 +85,7 @@ class ReservationServiceTest {
         Reservation saved = captor.getValue();
 
         assertThat(saved.getName()).isEqualTo("브라운");
-        assertThat(saved.getDate()).isEqualTo("2026-09-06");
+        assertThat(saved.getDate()).isEqualTo(LocalDate.of(2026, 9, 6));
         assertThat(saved.getTime().getId()).isEqualTo(1L);
         assertThat(saved.getTime().getTime())
                 .isEqualTo(LocalTime.of(10, 1));
@@ -119,16 +120,17 @@ class ReservationServiceTest {
         assertThat(captor.getValue().getId()).isEqualTo(1L);
         assertThat(captor.getValue().getTime().getTime())
                 .isEqualTo(LocalTime.of(11, 0));
+
         assertThat(updated.getName()).isEqualTo("브라운");
+        assertThat(updated.getDate()).isEqualTo(LocalDate.of(2026, 9, 6));
     }
 
     @Test
-    void 존재하지_않는_시간으로_예약할_수_없다() {
-        when(timeRepository.findById(999L))
-                .thenReturn(Optional.empty());
+    void 존재하지_않는_날짜로_예약할_수_없다() {
+        시간등록("10:00");
 
         assertThatThrownBy(() -> reservationService.create(
-                "브라운", "2026-09-07", 999L
+                "브라운", "2026-99-99", 1L
         )).isInstanceOf(InvalidReservationException.class);
 
         verifyNoInteractions(reservationRepository);

@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalTime;
+import java.time.LocalDate;
 
 @Repository
 public class ReservationRepository {
@@ -25,7 +26,7 @@ public class ReservationRepository {
             (rs, rowNum) -> new Reservation(
                     rs.getLong("id"),
                     rs.getString("name"),
-                    rs.getString("date"),
+                    LocalDate.parse(rs.getString("date")),
                     new ReservationTime(
                             rs.getLong("time_id"),
                             rs.getObject("time", LocalTime.class)
@@ -70,7 +71,7 @@ public class ReservationRepository {
             );
 
             statement.setString(1, reservation.getName());
-            statement.setString(2, reservation.getDate());
+            statement.setString(2, reservation.getDate().toString());
             statement.setLong(3, reservation.getTime().getId());
 
             return statement;
@@ -96,7 +97,7 @@ public class ReservationRepository {
         return jdbcTemplate.update(
                 sql,
                 reservation.getName(),
-                reservation.getDate(),
+                reservation.getDate().toString(),
                 reservation.getTime().getId(),
                 reservation.getId()
         );

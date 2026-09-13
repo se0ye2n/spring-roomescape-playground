@@ -308,4 +308,40 @@ public class MissionStepTest {
                 .statusCode(200)
                 .body("size()", equalTo(0));
     }
+
+    @Test
+    void 예약_날짜가_저장과_조회_후에도_유지된다() {
+        int timeId = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(Map.of("time", "10:00"))
+                .when().post("/times")
+                .then()
+                .statusCode(201)
+                .extract().path("id");
+
+        String date = java.time.LocalDate.now(
+                java.time.ZoneId.of("Asia/Seoul")
+        ).plusDays(1).toString();
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("name", "브라운");
+        request.put("date", date);
+        request.put("time", timeId);
+
+        int reservationId = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then()
+                .statusCode(201)
+                .body("date", equalTo(date))
+                .extract().path("id");
+
+        RestAssured.given()
+                .when().get("/reservations/" + reservationId)
+                .then()
+                .statusCode(200)
+                .body("date", equalTo(date))
+                .body("time.id", equalTo(timeId));
+    }
 }

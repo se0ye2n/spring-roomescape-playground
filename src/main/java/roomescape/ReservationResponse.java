@@ -23,7 +23,7 @@ public class ReservationResponse {
         return new ReservationResponse(
                 reservation.getId(),
                 reservation.getName(),
-                reservation.getDate(),
+                reservation.getDate().toString(),
                 ReservationTimeResponse.from(reservation.getTime())
         );
     }
